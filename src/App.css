@@ -2,6 +2,7 @@ html,
 body {
   margin: 0;
   /* font-family: 'Roboto', sans-serif; */
+    font-family: Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* background-color: #02bfee; */
@@ -321,6 +322,7 @@ h1 {
   font-family: inherit;
   justify-content: center;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .positions .title {
@@ -345,4 +347,60 @@ h1 {
 
 .landing-text {
   width: 240px;
+}
+
+.member-page {
+  font-family: inherit;
+}
+
+.search-stocks {
+  width: auto;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: normal;
+  color: #fff;
+  height: 35px;
+  background: rgba(229, 229, 229, 0.34);
+  border-radius: 10px;
+  border: none;
+}
+
+.search-stocks:focus {
+    outline: none;
+}
+
+.company-stats {
+  margin-top: 24px;
+  width: 900px;
+  height: 408px;
+  font-weight: 400;
+  background-color: #fff;
+  color: #000;
+  border-radius: 40px;
+  font-family: inherit;
+}
+
+.vote-image {
+  height: 72px;
+  margin: 12px;
+}
+
+.vote-bar {
+  margin-top: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.vote-bar span {
+  font-size: 45px;
+  font-weight: 700;
+}
+
+.main-page {
+    width: 100vw;
+    background-color: #000;
+    color: #fff;
+    text-align: left;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
 }

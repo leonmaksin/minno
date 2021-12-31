@@ -7,6 +7,9 @@ import { UnsupportedChainIdError } from "@web3-react/core";
 import Header from './Components/Header.js';
 import GeneralStats from './Components/GeneralStats.js';
 import Positions from './Components/Positions';
+import Challengers from './Components/Challengers';
+import CompanyStats from './Components/CompanyStats';
+import Vote from './Components/Vote';
 
 const sdk = new ThirdwebSDK("rinkeby");
 const bundleDropModule = sdk.getBundleDropModule(
@@ -169,6 +172,10 @@ const App = () => {
   }
 
   const mintToken = () => {
+    if (hasClaimedNFT) {
+      console.log("🎉 You already have a token!");
+      return;
+    }
     setIsClaiming(true);
     // Call bundleDropModule.claim("0", 1) to mint nft to user's wallet.
     bundleDropModule
@@ -215,145 +222,161 @@ const App = () => {
 
   if (hasClaimedNFT) {
     return (
-      <div className="member-page">
-        <h1>🐟 Minno Member Page</h1>
-        <p>Congratulations on being a member</p>
-        <div>
-          <div>
-            <h2>Member List</h2>
-            <table className="card">
-              <thead>
-                <tr>
-                  <th>Address</th>
-                  <th>Token Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {memberList.map((member) => {
-                  return (
-                    <tr key={member.address}>
-                      <td>{shortenAddress(member.address)}</td>
-                      <td>{member.tokenAmount}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      <div className="main-page">
+        <div className="flex-col">
+          <div className="flex-row">
+            <Header />
           </div>
-          <div>
-            <h2>Active Proposals</h2>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsVoting(true);
-                const votes = proposals.map((proposal) => {
-                  let voteResult = {
-                    proposalId: proposal.proposalId,
-                    vote: 2,
-                  };
-                  proposal.votes.forEach((vote) => {
-                    const elem = document.getElementById(
-                      proposal.proposalId + "-" + vote.type
-                    );
-
-                    if (elem.checked) {
-                      voteResult.vote = vote.type;
-                      return;
-                    }
-                  });
-                  return voteResult;
-                });
-
-                try {
-                  const delegation = await tokenModule.getDelegationOf(address);
-                  if (delegation === ethers.constants.AddressZero) {
-                    await tokenModule.delegateTo(address);
-                  }
-                  try {
-                    await Promise.all(
-                      votes.map(async (vote) => {
-                        const proposal = await voteModule.get(vote.proposalId);
-                        // check if the proposal is open for voting (state === 1 means it is open)
-                        if (proposal.state === 1) {
-                          return voteModule.vote(vote.proposalId, vote.vote);
-                        }
-                        return;
-                      })
-                    );
-                    try {
-                      // if any of the propsals are ready to be executed we'll need to execute them
-                      // a proposal is ready to be executed if it is in state 4
-                      await Promise.all(
-                        votes.map(async (vote) => {
-                          // we'll first get the latest state of the proposal again, since we may have just voted before
-                          const proposal = await voteModule.get(
-                            vote.proposalId
-                          );
-
-                          //if the state is in state 4 (meaning that it is ready to be executed), we'll execute the proposal
-                          if (proposal.state === 4) {
-                            return voteModule.execute(vote.proposalId);
-                          }
-                        })
-                      );
-                      // if we get here that means we successfully voted, so let's set the "hasVoted" state to true
-                      setHasVoted(true);
-                      // and log out a success message
-                      console.log("successfully voted");
-                    } catch (err) {
-                      console.error("failed to execute votes", err);
-                    }
-                  } catch (err) {
-                    console.error("failed to vote", err);
-                  }
-                } catch (err) {
-                  console.error("failed to delegate tokens");
-                } finally {
-                  // in *either* case we need to set the isVoting state to false to enable the button again
-                  setIsVoting(false);
-                }
-              }}
-            >
-              {proposals.map((proposal, index) => (
-                <div key={proposal.proposalId} className="card">
-                  <h5>{proposal.description}</h5>
-                  <div>
-                    {proposal.votes.map((vote) => (
-                      <div key={vote.type}>
-                        <input
-                          type="radio"
-                          id={proposal.proposalId + "-" + vote.type}
-                          name={proposal.proposalId}
-                          value={vote.type}
-                          //default the "abstain" vote to chedked
-                          defaultChecked={vote.type === 2}
-                        />
-                        <label htmlFor={proposal.proposalId + "-" + vote.type}>
-                          {vote.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <button disabled={isVoting || hasVoted} type="submit">
-                {isVoting
-                  ? "Voting..."
-                  : hasVoted
-                    ? "You Already Voted"
-                    : "Submit Votes"}
-              </button>
-              <small>
-                This will trigger multiple transactions that you will need to
-                sign.
-              </small>
-            </form>
+          <div className="flex-row">
+            <div style={{'width':'104px'}}></div>
+            <div className="flex-row">
+              <Challengers />
+            </div>
+            <div style={{'width':'76px'}}></div>
+            <div className="flex-col">
+              <input className="search-stocks"></input>
+              <CompanyStats />
+              <Vote className="flex-row" />
+            </div>
           </div>
-
-
         </div>
       </div>
+
+      // <div className="member-page">
+      //   <div>
+      //     <div>
+      //       <h2>Member List</h2>
+      //       <table className="card">
+      //         <thead>
+      //           <tr>
+      //             <th>Address</th>
+      //             <th>Token Amount</th>
+      //           </tr>
+      //         </thead>
+      //         <tbody>
+      //           {memberList.map((member) => {
+      //             return (
+      //               <tr key={member.address}>
+      //                 <td>{shortenAddress(member.address)}</td>
+      //                 <td>{member.tokenAmount}</td>
+      //               </tr>
+      //             );
+      //           })}
+      //         </tbody>
+      //       </table>
+      //     </div>
+      //     <div>
+      //       <h2>Active Proposals</h2>
+      //       <form
+      //         onSubmit={async (e) => {
+      //           e.preventDefault();
+      //           e.stopPropagation();
+      //           setIsVoting(true);
+      //           const votes = proposals.map((proposal) => {
+      //             let voteResult = {
+      //               proposalId: proposal.proposalId,
+      //               vote: 2,
+      //             };
+      //             proposal.votes.forEach((vote) => {
+      //               const elem = document.getElementById(
+      //                 proposal.proposalId + "-" + vote.type
+      //               );
+
+      //               if (elem.checked) {
+      //                 voteResult.vote = vote.type;
+      //                 return;
+      //               }
+      //             });
+      //             return voteResult;
+      //           });
+
+      //           try {
+      //             const delegation = await tokenModule.getDelegationOf(address);
+      //             if (delegation === ethers.constants.AddressZero) {
+      //               await tokenModule.delegateTo(address);
+      //             }
+      //             try {
+      //               await Promise.all(
+      //                 votes.map(async (vote) => {
+      //                   const proposal = await voteModule.get(vote.proposalId);
+      //                   // check if the proposal is open for voting (state === 1 means it is open)
+      //                   if (proposal.state === 1) {
+      //                     return voteModule.vote(vote.proposalId, vote.vote);
+      //                   }
+      //                   return;
+      //                 })
+      //               );
+      //               try {
+      //                 // if any of the propsals are ready to be executed we'll need to execute them
+      //                 // a proposal is ready to be executed if it is in state 4
+      //                 await Promise.all(
+      //                   votes.map(async (vote) => {
+      //                     // we'll first get the latest state of the proposal again, since we may have just voted before
+      //                     const proposal = await voteModule.get(
+      //                       vote.proposalId
+      //                     );
+
+      //                     //if the state is in state 4 (meaning that it is ready to be executed), we'll execute the proposal
+      //                     if (proposal.state === 4) {
+      //                       return voteModule.execute(vote.proposalId);
+      //                     }
+      //                   })
+      //                 );
+      //                 // if we get here that means we successfully voted, so let's set the "hasVoted" state to true
+      //                 setHasVoted(true);
+      //                 // and log out a success message
+      //                 console.log("successfully voted");
+      //               } catch (err) {
+      //                 console.error("failed to execute votes", err);
+      //               }
+      //             } catch (err) {
+      //               console.error("failed to vote", err);
+      //             }
+      //           } catch (err) {
+      //             console.error("failed to delegate tokens");
+      //           } finally {
+      //             // in *either* case we need to set the isVoting state to false to enable the button again
+      //             setIsVoting(false);
+      //           }
+      //         }}
+      //       >
+      //         {proposals.map((proposal, index) => (
+      //           <div key={proposal.proposalId} className="card">
+      //             <h5>{proposal.description}</h5>
+      //             <div>
+      //               {proposal.votes.map((vote) => (
+      //                 <div key={vote.type}>
+      //                   <input
+      //                     type="radio"
+      //                     id={proposal.proposalId + "-" + vote.type}
+      //                     name={proposal.proposalId}
+      //                     value={vote.type}
+      //                     //default the "abstain" vote to chedked
+      //                     defaultChecked={vote.type === 2}
+      //                   />
+      //                   <label htmlFor={proposal.proposalId + "-" + vote.type}>
+      //                     {vote.label}
+      //                   </label>
+      //                 </div>
+      //               ))}
+      //             </div>
+      //           </div>
+      //         ))}
+      //         <button disabled={isVoting || hasVoted} type="submit">
+      //           {isVoting
+      //             ? "Voting..."
+      //             : hasVoted
+      //               ? "You Already Voted"
+      //               : "Submit Votes"}
+      //         </button>
+      //         <small>
+      //           This will trigger multiple transactions that you will need to
+      //           sign.
+      //         </small>
+      //       </form>
+      //     </div>
+      //   </div>
+      // </div>
     );
   };
   
@@ -387,14 +410,7 @@ const App = () => {
         <div className="flex-row">
           <Positions />
         </div>
-        {/* <h1>🐟 Mint a free Minno membership token</h1>
-        <button
-          disabled={isClaiming}
-          onClick={() => mintToken()}
-        >
-          {isClaiming ? "Minting..." : "Mint your token (FREE)"}
-        </button> */}
-        </div>
+      </div>
     </div>
   );
 };
