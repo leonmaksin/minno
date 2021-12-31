@@ -1,15 +1,15 @@
-import './App.css';
+import '../App.css';
 import { useEffect, useMemo, useState } from "react";
 import { useWeb3 } from "@3rdweb/hooks";
 import { ThirdwebSDK } from "@3rdweb/sdk";
 import { ethers } from "ethers";
 import { UnsupportedChainIdError } from "@web3-react/core";
-import Header from './Components/Header.js';
-import GeneralStats from './Components/GeneralStats.js';
-import Positions from './Components/Positions';
-import Challengers from './Components/Challengers';
-import CompanyStats from './Components/CompanyStats';
-import Vote from './Components/Vote';
+import Header from '../Components/Header.js';
+import GeneralStats from '../Components/GeneralStats.js';
+import Positions from '../Components/Positions';
+import Challengers from '../Components/Challengers';
+import CompanyStats from '../Components/CompanyStats';
+import Vote from '../Components/Vote';
 
 const sdk = new ThirdwebSDK("rinkeby");
 const bundleDropModule = sdk.getBundleDropModule(
@@ -225,7 +225,7 @@ const App = () => {
       <div className="main-page">
         <div className="flex-col">
           <div className="flex-row">
-            <Header />
+            <Header selected="vote" />
           </div>
           <div className="flex-row">
             <div style={{'width':'104px'}}></div>
@@ -239,8 +239,60 @@ const App = () => {
               <Vote className="flex-row" />
             </div>
           </div>
+          <div style={{'height':'40px'}}></div>
+          <div className="flex-row">
+            <div style={{'width':'104px'}}></div>
+            <GeneralStats />
+            <div style={{'width':'32px'}}></div>
+            <div className="flex-right">
+              <Positions />
+            </div>
+          </div>
+          <div style={{'height':'64px'}}></div>
         </div>
       </div>
+    );
+  };
+  
+  return (
+    <div className="landing-page">
+      <div className="flex-row">
+        <Header selected="home" />
+      </div>
+      <div className="flex-row">
+        <div style={{'width':'104px'}}></div>
+        <div className="flex-col landing-text">
+          <p className="title">Minno</p>
+          <div style={{'height':'20px'}}></div>
+          <p className="title-subtext">Strength in numbers</p>
+          <div style={{'height':'20px'}}></div>
+          <p className="title-subtext">Mint a membership token to join the shoal, buy $MINNO to gain
+          voting power and choose stocks for the portfolio</p>
+          <div style={{'height':'35px'}}></div>
+          <button className="clickable"
+            disabled={isClaiming}
+            onClick={() => mintToken()}
+          >
+            {isClaiming ? "Minting..." : "Mint your token"}
+          </button>
+        </div>
+        <div style={{'width':'76px'}}></div>
+        <div className="flex-row">
+          <GeneralStats />
+        </div>
+        <div style={{'width':'48px'}}></div>
+        <div className="flex-row">
+          <Positions />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+
 
       // <div className="member-page">
       //   <div>
@@ -377,42 +429,3 @@ const App = () => {
       //     </div>
       //   </div>
       // </div>
-    );
-  };
-  
-  return (
-    <div className="landing-page">
-      <div className="flex-row">
-        <Header />
-      </div>
-      <div className="flex-row">
-        <div style={{'width':'104px'}}></div>
-        <div className="flex-col landing-text">
-          <p className="title">Minno</p>
-          <div style={{'height':'20px'}}></div>
-          <p className="title-subtext">Strength in numbers</p>
-          <div style={{'height':'20px'}}></div>
-          <p className="title-subtext">Mint a membership token to join the shoal, buy $MINNO to gain
-          voting power and choose stocks for the portfolio</p>
-          <div style={{'height':'35px'}}></div>
-          <button className="clickable"
-            disabled={isClaiming}
-            onClick={() => mintToken()}
-          >
-            {isClaiming ? "Minting..." : "Mint your token"}
-          </button>
-        </div>
-        <div style={{'width':'76px'}}></div>
-        <div className="flex-row">
-          <GeneralStats />
-        </div>
-        <div style={{'width':'48px'}}></div>
-        <div className="flex-row">
-          <Positions />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default App;

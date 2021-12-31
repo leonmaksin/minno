@@ -200,6 +200,10 @@ h1 {
   color: #fff;
 }
 
+.header-selected {
+  color: #fff !important;
+}
+
 .login-gray {
     color: #666;
 }
@@ -403,4 +407,8 @@ h1 {
     text-align: left;
     font-family: Inter, sans-serif;
     font-weight: 500;
+}
+
+.flex-right {
+  -ms-flex-align: end;
 }
